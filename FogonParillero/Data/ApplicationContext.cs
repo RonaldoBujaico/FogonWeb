@@ -1,0 +1,15 @@
+﻿using FogonParillero.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace FogonParillero.Data
+{
+    public class ApplicationContext : DbContext
+    {
+        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+            : base(options) { }
+
+        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<CategoriaProducto> CategoriasProducto { get; set; }
+        public DbSet<Producto> Productos { get; set; }
+    }
+}
