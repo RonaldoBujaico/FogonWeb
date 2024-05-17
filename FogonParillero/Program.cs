@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 
 builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<ICategoriaProductoInterface, CategoriaProductoService>();
+builder.Services.AddScoped<ICategoriaInsumoInterface, CategoriaInsumoService>();
 builder.Services.AddScoped<IProductoInterface, ProductoService>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
 
