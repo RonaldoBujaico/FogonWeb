@@ -20,6 +20,13 @@ namespace FogonParillero.Services
         {
             _contexto.CategoriasProducto.Update(categoriaProducto);
             await _contexto.SaveChangesAsync();
+ 
+
+            var imagen = await _imagenService.SubirImagenPorRutaAsync(categoriaProducto.ImagenUrl, $"categoriaproducto{categoriaProducto.CategoriaId}");
+            var imageUrl = $"https://fogonparillero.azurewebsites.net/api/Imagen/{imagen.filename}";
+            categoriaProducto.ImagenUrl = imageUrl;
+            _contexto.Update(categoriaProducto);
+            await _contexto.SaveChangesAsync();
             return categoriaProducto;
         }
 
@@ -52,7 +59,7 @@ namespace FogonParillero.Services
             await _contexto.SaveChangesAsync();
 
             var imagen = await _imagenService.SubirImagenPorRutaAsync(ruta, $"categoriaproducto{nuevoCategoriaProducto.CategoriaId}");
-            var imageUrl = $"https://localhost:7122/api/Imagen/{imagen.filename}";
+            var imageUrl = $"https://fogonparillero.azurewebsites.net/api/Imagen/{imagen.filename}";
             nuevoCategoriaProducto.ImagenUrl = imageUrl;
             _contexto.Update(nuevoCategoriaProducto);
             await _contexto.SaveChangesAsync();

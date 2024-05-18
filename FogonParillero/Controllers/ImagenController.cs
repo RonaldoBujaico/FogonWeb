@@ -19,7 +19,7 @@ namespace FogonParillero.Controllers
         public async Task<IActionResult> SubirImagenAsync(Imagen imagen)
         {
             var url = await _imagenService.SubirImagenAsync(imagen.imagen, imagen.filename);
-            url.imagen = $"https://localhost:7122/api/Imagen/{url.filename}";
+            url.imagen = $"https://fogonparillero.azurewebsites.net/api/Imagen/{url.filename}";
 
             return Ok(url);
         }
@@ -42,7 +42,7 @@ namespace FogonParillero.Controllers
         public async Task<IActionResult> SubirImagenPorRutaAsync(Imagen imagen)
         {
             var url = await _imagenService.SubirImagenPorRutaAsync(imagen.imagen, imagen.filename);
-            url.imagen = $"https://localhost:7122/api/Imagen/{url.filename}";
+            url.imagen = $"https://fogonparillero.azurewebsites.net/api/Imagen/{url.filename}";
 
             return Ok(url);
         }
