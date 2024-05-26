@@ -16,10 +16,12 @@ builder.Services.AddScoped<IUsuarioInterface, UsuarioService>();
 builder.Services.AddScoped<ICategoriaProductoInterface, CategoriaProductoService>();
 builder.Services.AddScoped<ICategoriaInsumoInterface, CategoriaInsumoService>();
 builder.Services.AddScoped<IProductoInterface, ProductoService>();
+builder.Services.AddScoped<IInsumoInterface, InsumoService>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
@@ -45,6 +47,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
 
 app.Run();
