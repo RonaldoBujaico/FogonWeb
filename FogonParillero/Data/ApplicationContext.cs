@@ -12,5 +12,6 @@ namespace FogonParillero.Data
         public DbSet<CategoriaProducto> CategoriasProducto { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<CategoriaInsumo> CategoriasInsumo { get; set; }
+        public DbSet<Insumo> Insumos { get; set; }
     }
 }

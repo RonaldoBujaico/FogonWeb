@@ -20,14 +20,6 @@ namespace FogonParillero.Controllers
             return View(categorias);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Registrar()
-        {
-            ViewData["ModalAbierto"] = true;
-            var categorias = await _categoria.ObtenerTodosAsync();
-            return View("Index", categorias);
-        }
-
         [HttpPost]
         public IActionResult CerrarModal()
         {
