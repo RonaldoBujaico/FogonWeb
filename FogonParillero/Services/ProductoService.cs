@@ -18,8 +18,20 @@ namespace FogonParillero.Services
 
         public async Task<Producto> Actualizar(Producto producto)
         {
+            var base64 = producto.ImagenUrl;
+            producto.ImagenUrl = "";
+
             _contexto.Productos.Update(producto);
             await _contexto.SaveChangesAsync();
+
+            if (base64 != null)
+            {
+                var imagen = await _imagenService.SubirImagenAsync(base64, $"producto{producto.ProductoId}");
+                var imagenUrl = $"https://fogonparillero.azurewebsites.net/api/Imagen/{imagen.filename}";
+                producto.ImagenUrl = imagenUrl;
+                _contexto.Update(producto);
+                await _contexto.SaveChangesAsync();
+            }
             return producto;
         }
 
