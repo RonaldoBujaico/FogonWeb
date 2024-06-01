@@ -3,6 +3,10 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FogonParillero.Interfaces;
 using FogonParillero.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+
 
 namespace FogonParillero.Services
 {
@@ -43,19 +47,34 @@ namespace FogonParillero.Services
             var response = await blobClient.DownloadAsync();
             return response.Value.Content;
         }
-
-        public async Task<Imagen> SubirImagenAsync(string imagen, string filename)
+        public async Task<Imagen> SubirImagenAsync(string imagenBase64, string filename)
         {
-            byte[] bytes = Convert.FromBase64String(imagen);
+            BlobClient blobClient;
 
-            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
-            BlobClient blobClient = containerClient.GetBlobClient(filename);
+            // Convertir la imagen base64 en bytes
+            byte[] bytes = Convert.FromBase64String(imagenBase64);
 
-            using (MemoryStream stream = new MemoryStream(bytes))
+            // Crear una imagen a partir de los bytes
+            using (Image image = Image.Load(bytes))
             {
-                await blobClient.UploadAsync(stream, true);
+                // Redimensionar la imagen a 512x512
+                image.Mutate(x => x.Resize(512, 512));
+
+                // Guardar la imagen redimensionada en un nuevo MemoryStream
+                using (MemoryStream resizedStream = new MemoryStream())
+                {
+                    image.Save(resizedStream, new PngEncoder());
+
+                    // Subir la imagen redimensionada al Blob Storage
+                    BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
+                    blobClient = containerClient.GetBlobClient(filename);
+
+                    resizedStream.Position = 0; // Reiniciar la posición del stream
+                    await blobClient.UploadAsync(resizedStream, true);
+                }
             }
 
+            // Crear un objeto Imagen con la URL del Blob Storage
             var result = new Imagen()
             {
                 imagen = blobClient.Uri.ToString(),
@@ -67,15 +86,25 @@ namespace FogonParillero.Services
 
         public async Task<Imagen> SubirImagenPorRutaAsync(string ruta, string filename)
         {
+            BlobClient blobClient;
             string rutaCompleta = Path.Combine("wwwroot", "iconos", ruta);
+
             byte[] bytes = await File.ReadAllBytesAsync(rutaCompleta);
 
-            var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
-            var blobClient = containerClient.GetBlobClient(filename);
-
-            using (MemoryStream stream = new MemoryStream(bytes))
+            using (Image image = Image.Load(bytes))
             {
-                await blobClient.UploadAsync(stream, true);
+                image.Mutate(x => x.Resize(256, 256));
+
+                using (MemoryStream resizedStream = new MemoryStream())
+                {
+                    image.Save(resizedStream, new PngEncoder());
+
+                    var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
+                    blobClient = containerClient.GetBlobClient(filename);
+
+                    resizedStream.Position = 0;
+                    await blobClient.UploadAsync(resizedStream, true);
+                }
             }
 
             var result = new Imagen()
