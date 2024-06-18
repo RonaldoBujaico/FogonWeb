@@ -22,5 +22,11 @@ namespace FogonParillero.Models
 
         [Column("unidad_id")]
         public int UnidadId { get; set; }
+
+        public Unidad Unidad { get; set; }
+
+
+
+
     }
 }
