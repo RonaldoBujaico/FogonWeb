@@ -44,7 +44,25 @@ namespace FogonParillero.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> ActualizarCategoria(int id, string nombreCategoria)
+        {
+            var categoriaExistente = await _categoria.ObtenerPorId(id);
 
+            categoriaExistente.Nombre = nombreCategoria;
+            
+            await _categoria.Actualizar(categoriaExistente);
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var categoriaInsumo = await _categoria.ObtenerPorId(id);
+            await _categoria.Eliminar(categoriaInsumo);
+            return RedirectToAction("Index");
+        }
 
 
 
