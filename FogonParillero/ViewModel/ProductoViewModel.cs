@@ -8,7 +8,6 @@ namespace FogonParillero.ViewModel
         public IEnumerable<Insumo> Insumos { get; set; }
         public IEnumerable<CategoriaProducto> Categorias { get; set; }
         public Producto Producto { get; set; }
-
-        
+        public IEnumerable<DetalleInsumo> DetalleInsumos { get; set; }
     }
 }
