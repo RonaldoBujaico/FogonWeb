@@ -19,6 +19,7 @@ builder.Services.AddScoped<IProductoInterface, ProductoService>();
 builder.Services.AddScoped<IInsumoInterface, InsumoService>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
 builder.Services.AddScoped<IUnidadInterface, UnidadService>();
+builder.Services.AddScoped<IDetalleInsumoInterface, DetalleInsumoService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

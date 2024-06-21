@@ -64,6 +64,7 @@ namespace FogonParillero.Controllers
             return RedirectToAction("Index");
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Actualizar(int productoIdEditar, string nombreProducto, string? descripcion, decimal precioVenta, string imagenUrl, int categoriaProductoId)
         {
