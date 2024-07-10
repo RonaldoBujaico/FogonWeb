@@ -8,6 +8,7 @@ namespace FogonParillero.ViewModel
         public IEnumerable<Insumo> Insumos { get; set; }
         public IEnumerable<CategoriaProducto> Categorias { get; set; }
         public Producto Producto { get; set; }
+<<<<<<< HEAD
         public List<Mesa> Mesa { get; set; }
         public List<Pedido> Pedidos { get; set; }
         public IEnumerable<DetalleInsumo> DetalleInsumos { get; set; }
@@ -26,5 +27,8 @@ namespace FogonParillero.ViewModel
         public int ProductoId { get; set; }
         public int Cantidad { get; set; }
         public decimal Precio { get; set; }
+=======
+        public IEnumerable<DetalleInsumo> DetalleInsumos { get; set; }
+>>>>>>> 2045db2c0ccac8e406a72b96d93ff057c405aa53
     }
 }
