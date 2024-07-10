@@ -1,0 +1,77 @@
+﻿@model FogonParillero.ViewModel.ProductoViewModel
+
+@{
+    ViewData["Title"] = "Ventas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    DateTime horaActual = DateTime.Now;
+}
+
+<div class="flex h-screen">
+    <!-- Menú Lateral -->
+    @Html.Partial("_MenuLateral")
+
+    <!-- Contenido principal -->
+    <div class="flex-1 flex flex-col">
+        <!-- Encabezado -->
+        <div class="bg-transparent-800 text-black p-4">
+            <h1 class="text-2xl font-bold">@ViewData["Detalle De Mesa"]</h1>
+            @if (!string.IsNullOrEmpty(ViewBag.MesaSeleccionada))
+            {
+                <p class="text-lg mt-2">Usted está en la mesa: @ViewBag.MesaSeleccionada</p>
+            }
+        </div>
+
+        <!-- Tabla de Pedidos -->
+        <div class="p-4">
+            <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-200 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 text-left">ID de Pedido</th>
+                        <th class="px-4 py-2 text-left">ID de Mesa</th>
+                        <th class="px-4 py-2 text-left">Fecha del Pedido</th>
+                        <th class="px-4 py-2 text-left">Estado</th>
+                        <th class="px-4 py-2 text-right">Total</th>
+                        <th class="px-4 py-2 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600">
+                    @foreach (var pedido in Model.Pedidos)
+                    {
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-4 py-2">@pedido.PedidoId</td>
+                            <td class="border px-4 py-2">@pedido.MesaId</td>
+                            <td class="border px-4 py-2">@pedido.FechaPedido.ToShortDateString()</td>
+                            <td class="border px-4 py-2">@pedido.Estado</td>
+                            <td class="border px-4 py-2 text-right">@pedido.Total.ToString("C")</td>
+                            <td class="border px-4 py-2 text-right">
+                                @if (pedido.Estado == "Pendiente")
+                                {
+                                    <form method="post" asp-action="Pagar" asp-route-pedidoId="@pedido.PedidoId">
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                                            Pagar
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-500">Pagado</span>
+                                }
+                                <button type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full mt-2"
+                                        onclick="window.location.href='/PedidoDetalle/Index?PedidoId=@pedido.PedidoId'">
+                                    Detalle
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón de Regresar -->
+        <div class="p-4">
+            <a href="@Url.Action("Index", "Mesa")" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                Regresar a Mesas
+            </a>
+        </div>
+    </div>
+</div>

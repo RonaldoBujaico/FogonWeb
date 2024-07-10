@@ -1,0 +1,134 @@
+﻿@model FogonParillero.ViewModel.ProductoViewModel
+
+@{
+    ViewData["Title"] = "Mesas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="flex h-screen">
+    @Html.Partial("_MenuLateral")
+
+    <!-- Parte izquierda (mesas) -->
+    <div class="flex-1 flex flex-col border-r border-gray-200">
+        <div class="bg-transparent-800 text-black p-4 flex justify-between items-center">
+            <div class="flex">
+                <a href="/mesa" class="text-xl mr-12 ml-6 font-bold text-gray-700">Mesas</a>
+                <a href="/ventas" class="text-xl mr-12 font-bold text-gray-700 opacity-60">Ventas</a>
+            </div>
+        </div>
+
+        <!-- Contenido de mesas con scroll -->
+        <div class="p-4 overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Mesas Disponibles</h2>
+
+            <!-- Lista de mesas -->
+            <div class="grid grid-cols-3 gap-4">
+                @foreach (var mesa in Model.Mesa)
+                {
+                    <div class="@GetEstadoClase(mesa.Estado)" data-mesa-id="@mesa.MesaId" data-mesa-estado="@mesa.Estado">
+                        <div class="bg-white p-4 border rounded-lg overflow-hidden shadow-md">
+                            <h3 class="text-lg font-bold mb-2">Mesa @mesa.NumeroMesa</h3>
+                            <p class="mb-2"><strong>Estado:</strong> <span class="@GetEstadoTextoClase(mesa.Estado)">@mesa.Estado</span></p>
+                            <p class="mb-2"><strong>N° personas:</strong> 4</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Delegación de eventos para manejar el clic en una mesa
+            $(document).on("click", ".mesa-item", function () {
+                var mesaId = $(this).data("mesa-id");
+                var estadoMesa = $(this).find(".estado-disponible, .estado-ocupado").text().trim();
+
+                // Solo redireccionar si la mesa está disponible u ocupada
+                if (estadoMesa === "Vacio") {
+                    // Guardar el número de mesa seleccionada en una cookie
+                    document.cookie = `mesaSeleccionada=${mesaId}; path=/`;
+
+                    // Redireccionar a la vista de detalle de mesa
+                    window.location.href = "/MesaDetalle/Index";
+                } else if (estadoMesa === "Ocupado") {
+                    // Redireccionar a la vista de pago
+                    window.location.href = `/Pago/Index?mesaId=${mesaId}`;
+                }
+            });
+        });
+    </script>
+
+}
+
+<style>
+    .mesa-item {
+        transition: transform 0.2s ease-in-out;
+        min-height: 150px;
+        cursor: pointer; /* Cambiar cursor a pointer para indicar que es clickable */
+        border-width: 2px; /* Grosor del borde */
+        border-style: solid; /* Estilo de borde */
+    }
+
+        .mesa-item:hover {
+            transform: scale(1.05);
+        }
+
+    .mesa-disponible {
+        border-color: #28a745; /* Color de borde verde para mesas disponibles */
+    }
+
+    .mesa-ocupado {
+        border-color: #dc3545; /* Color de borde rojo para mesas ocupadas */
+    }
+
+    .estado-disponible {
+        color: #28a745; /* Verde */
+    }
+
+    .estado-ocupado {
+        color: #dc3545; /* Rojo */
+    }
+
+    .bg-red-500 {
+        background-color: #dc3545; /* Rojo */
+    }
+
+        .bg-red-500:hover {
+            background-color: #dc3545; /* Rojo oscuro al pasar el mouse */
+        }
+
+    /* Estilo para el contenedor de mesas con scroll */
+    .overflow-y-auto {
+        max-height: 600px; /* Altura máxima del contenedor */
+    }
+</style>
+
+@functions {
+    string GetEstadoClase(string estado)
+    {
+        if (estado.Equals("Vacio", StringComparison.OrdinalIgnoreCase))
+        {
+            return "mesa-item mesa-disponible"; // Agrega la clase 'mesa-disponible'
+        }
+       
+        else
+        {
+            return "mesa-item mesa-ocupado"; // Agrega la clase 'mesa-ocupado' para otros estados
+        }
+    }
+
+    string GetEstadoTextoClase(string estado)
+    {
+        if (estado.Equals("Vacio", StringComparison.OrdinalIgnoreCase))
+        {
+            return "estado-disponible"; // Clase para texto verde
+        }
+        else
+        {
+            return "estado-ocupado"; // Clase para texto rojo
+        }
+    }
+}

@@ -1,0 +1,59 @@
+﻿@model List<FogonParillero.Models.PedidoDetalle>
+
+@{
+    ViewData["Title"] = "_DetallesPedido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="flex h-screen">
+    <!-- Menú Lateral -->
+    @Html.Partial("_MenuLateral")
+
+    <!-- Contenido principal -->
+    <div class="flex-1 flex flex-col">
+        <div class="bg-transparent-800 text-black p-4 flex justify-between items-center">
+            <div class="flex">
+                <a href="/mesa" class="text-xl mr-12 ml-6 font-bold text-gray-700">Mesa</a>
+                <a href="/ventas" class="text-xl mr-12 font-bold text-gray-700 opacity-60">Ventas</a>
+            </div>
+        </div>
+        <!-- Encabezado -->
+        <div class="bg-transparent-800 text-white p-4">
+            <h1 class="text-2xl font-bold">Detalle del Pedido</h1>
+        </div>
+
+        <!-- Tabla de Detalles del Pedido -->
+        <div class="p-4">
+            <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-200 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 text-left">ID de Pedido</th>
+                        <th class="px-4 py-2 text-left">Producto</th>
+                        <th class="px-4 py-2 text-left">Cantidad</th>
+                        <th class="px-4 py-2 text-right">Precio Unitario</th>
+                        <th class="px-4 py-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600">
+                    @foreach (var detalle in Model)
+                    {
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-4 py-2">@detalle.PedidoId</td>
+                            <td class="border px-4 py-2">@detalle.Producto.Nombre</td>
+                            <td class="border px-4 py-2">@detalle.Cantidad</td>
+                            <td class="border px-4 py-2 text-right">@detalle.Precio.ToString("C")</td>
+                            <td class="border px-4 py-2 text-right">@((detalle.Cantidad * detalle.Precio).ToString("C"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="p-4">
+            <button type="button" onclick="history.go(-1);" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                Regresar a la Lista de Pedidos
+            </button>
+        </div>
+
+    </div>
+</div>

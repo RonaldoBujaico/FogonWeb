@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .login-background::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('https://bucketrediseno.s3.amazonaws.com/uploads/photo/image/4814/how-to-grill-carne-asada.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.9;
+        z-index: -1;
+    }
+</style>
+
+<div class="flex h-screen items-center justify-center login-background">
+    <div class="w-full max-w-xs">
+        <img src="~/favicon.ico" class="block mx-auto mb-5" style="width: 150px; height: 150px;" />
+        <form asp-action="Index" method="post" class="rounded px-8 pt-6 pb-8 mb-4">
+            <div asp-validation-summary="All" class="text-red-600 mb-3"></div>
+            <div class="mb-4">
+                <input name="dni" id="dni" type="text" class="w-full border border-gray-200 rounded-lg py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="dni" />
+            </div>
+            <div class="mb-4">
+                <input name="contraseña" id="contraseña" type="password" class="w-full border border-gray-200 rounded-lg py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="contraseña" />
+            </div>
+            <div class="flex items-center justify-center">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline">Iniciar sesión</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,218 @@
+﻿@model FogonParillero.ViewModel.ProductoViewModel
+
+@{
+    ViewData["Title"] = "Mesa Detalle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool modalAbierto = ViewData["ModalAbierto"] as bool? ?? false;
+}
+
+<div class="flex h-screen">
+    @Html.Partial("_MenuLateral")
+
+    <!-- Parte izquierda (mesas y productos seleccionados) -->
+    <div class="flex-1 flex flex-col border-r border-gray-200">
+        <!-- Contenedor de mesas -->
+        <div class="p-4">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Mesa <span id="mesaSeleccionada"></span></h2>
+            <!-- Aquí va tu lógica para mostrar mesas, si tienes -->
+        </div>
+
+        <!-- Productos seleccionados -->
+        <div id="productosSeleccionados" class="p-4 flex-1 flex flex-col overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Lista</h2>
+            <ul id="listaProductos" class="divide-y divide-gray-200">
+                <!-- Aquí se agregan dinámicamente los productos seleccionados -->
+            </ul>
+
+            <div class="flex space-x-4 mt-4">
+                <div class="p-4">
+                    <a href="/mesa" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md">Regresar</a>
+                </div>
+                <button id="guardarPedido" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parte derecha (productos) con scroll vertical -->
+    <div class="flex-1 flex flex-col p-4 overflow-y-auto">
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Productos</h2>
+        <!-- Buscador de Productos -->
+        <div class="mb-4 flex items-center">
+            <input type="text" id="buscarProducto" placeholder="Buscar producto..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
+        </div>
+
+        <!-- Verifica si Model.Productos no es null antes de iterar -->
+        @if (Model != null && Model.Productos != null && Model.Productos.Any())
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                @foreach (var producto in Model.Productos)
+                {
+                    <div class="bg-white shadow-lg rounded-lg p-4 producto"
+                         data-producto-id="@producto.ProductoId"
+                         data-producto-nombre="@producto.Nombre"
+                         data-producto-precio="@producto.Precio">
+                        <img src="@producto.ImagenUrl" alt="@producto.Nombre" class="w-full h-auto mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">@producto.Nombre</h3>
+                        <p class="text-sm text-gray-600">Precio: @producto.Precio.ToString("C")</p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500 mt-4">No se encontraron productos.</p>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Obtener el valor de la cookie mesaSeleccionada
+            var mesaId = getCookie('mesaSeleccionada');
+            if (mesaId) {
+                $("#mesaSeleccionada").text(mesaId);
+            }
+
+            // Manejar clic en producto para agregarlo a la parte izquierda
+            $('.producto').click(function () {
+                var id = $(this).data('producto-id');
+                var nombre = $(this).data('producto-nombre');
+
+                // Verificar si el producto ya fue seleccionado para evitar duplicados
+                if (!$(`#listaProductos li[data-producto-id="${id}"]`).length) {
+                    // Agregar el producto a la lista de productos seleccionados
+                    var precio = $(this).data('producto-precio');
+                    var productoHtml = `
+                                <li class="py-2" data-producto-id="${id}">
+                                    <div class="flex items-center justify-between">
+                                        <span class="mr-4">${nombre}</span>
+                                        <div class="flex items-center">
+                                            <label class="mr-2">Cantidad:</label>
+                                            <input type="number" class="w-16 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 cantidad" value="1" min="1">
+                                            <label class="ml-4 mr-2">Precio:</label>
+                                            <input type="number" step="0.01" class="w-24 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 precio" value="${precio}" min="0.01">
+                                            <button type="button" class="btn-eliminar bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded-md ml-2">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </li>`;
+                    $('#listaProductos').append(productoHtml);
+                } else {
+                    // Mostrar alerta si el producto ya está seleccionado
+                    alert(`El producto "${nombre}" ya ha sido seleccionado.`);
+                }
+            });
+
+            // Delegar el evento click para el botón eliminar
+            $('#listaProductos').on('click', '.btn-eliminar', function () {
+                var id = $(this).closest('li').data('producto-id');
+                eliminarProducto(id);
+            });
+
+            // Evento para el campo de búsqueda
+            $('#buscarProducto').keyup(function () {
+                buscarProductos();
+            });
+
+            // Función para obtener el valor de una cookie por nombre
+            function getCookie(name) {
+                var cookieArr = document.cookie.split(';');
+                for (var i = 0; i < cookieArr.length; i++) {
+                    var cookiePair = cookieArr[i].split('=');
+                    if (name == cookiePair[0].trim()) {
+                        return decodeURIComponent(cookiePair[1]);
+                    }
+                }
+                return null;
+            }
+
+            function buscarProductos() {
+                var textoBusqueda = $('#buscarProducto').val().toLowerCase().trim();
+
+                // Oculta todos los productos
+                $('.producto').hide();
+
+                // Muestra solo los productos que coincidan con la búsqueda
+                $('.producto').each(function () {
+                    var nombreProducto = $(this).find('h3').text().toLowerCase();
+                    if (nombreProducto.includes(textoBusqueda)) {
+                        $(this).show();
+                    }
+                });
+            }
+
+            function eliminarProducto(id) {
+                // Eliminar el producto de la lista de productos seleccionados
+                $(`#listaProductos li[data-producto-id="${id}"]`).remove();
+            }
+
+            function guardarPedido() {
+                // Obtener la mesa seleccionada desde la cookie
+                var mesaId = getCookie('mesaSeleccionada');
+
+                // Obtener los productos seleccionados
+                var productos = [];
+                var validacionCorrecta = true;
+
+                // Verificar si hay productos seleccionados
+                if ($('#listaProductos li').length === 0) {
+                    alert('Debe seleccionar al menos un producto antes de guardar el pedido.');
+                    return; // Salir de la función si no hay productos seleccionados
+                }
+
+                $('#listaProductos li').each(function () {
+                    var id = $(this).data('producto-id');
+                    var cantidad = parseInt($(this).find('.cantidad').val());
+                    var precio = parseFloat($(this).find('.precio').val());
+
+                    // Validar que cantidad y precio sean números válidos
+                    if (isNaN(cantidad) || cantidad <= 0) {
+                        alert('La cantidad debe ser un número positivo.');
+                        validacionCorrecta = false;
+                        return false; // Evitar agregar producto inválido
+                    }
+                    if (isNaN(precio) || precio <= 0) {
+                        alert('El precio debe ser un número positivo.');
+                        validacionCorrecta = false;
+                        return false; // Evitar agregar producto inválido
+                    }
+
+                    productos.push({
+                        ProductoId: id,
+                        Cantidad: cantidad,
+                        Precio: precio.toFixed(2) // Redondear precio a 2 decimales
+                    });
+                });
+
+                if (!validacionCorrecta) {
+                    return; // No continuar si hay errores de validación
+                }
+
+                // AJAX request para guardar el pedido
+                $.ajax({
+                    url: '/Pedido/GuardarPedido', // Ajusta la ruta según tu controlador y acción
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        MesaId: mesaId,
+                        Productos: productos
+                    }),
+                    success: function (response) {
+                        alert('Pedido guardado exitosamente.');
+                        // Desactivar el botón de guardar una vez que se ha guardado el pedido
+                        $('#guardarPedido').prop('disabled', true);
+                    },
+                    error: function () {
+                        alert('Hubo un error al guardar el pedido.');
+                    }
+                });
+            }
+
+            // Manejar clic en el botón Guardar Pedido
+            $('#guardarPedido').click(function () {
+                guardarPedido();
+            });
+
+        });
+    </script>
+}

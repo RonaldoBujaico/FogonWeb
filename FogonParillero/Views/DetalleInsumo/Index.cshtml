@@ -1,0 +1,229 @@
+﻿@model FogonParillero.ViewModel.DetalleInsumoViewModel
+
+<div class="flex h-screen">
+   @Html.Partial("_MenuLateral")
+
+   <div class="flex-1 flex flex-col">
+        <div class="bg-transparent-800 text-black p-4 flex justify-between items-center">
+            <div class="flex">
+                <a href="/producto" class="text-xl mr-12 ml-6 font-bold text-gray-700 opacity-60">Productos</a>
+                <a href="/categoriaproducto" class="text-xl mr-12 font-bold text-gray-700 opacity-60">Categorías</a>
+                <a href="/detalleinsumo" class="text-xl mr-12 font-bold textgray-700">Detalle Insumos</a>
+            </div>
+    </div>
+
+    <div class="bg-gray-300 h-px w-full"></div>
+
+        <main class="flex-1">
+            <!-- Main modal -->
+            <div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                <div class="relative p-4 w-full max-w-md max-h-full">
+                    <!-- Modal content -->
+                    <div class="relative bg-white rounded-lg shadow">
+                        <!-- Modal header -->
+                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t-lg">
+                            <h3 class="text-2xl font-bold text-gray-454545">
+                                Detalle de Insumos
+                            </h3>
+                            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-toggle="crud-modal">
+                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                </svg>
+                                <span class="sr-only">Cerrar modal</span>
+                            </button>
+                        </div>
+                        <!-- Modal body -->
+                        <form id="registroForm" asp-action="Registrar" method="post" novalidate>
+                            <input type="hidden" id="productoId" name="productoId" />
+                            <div id="detalleInsumosContainer"></div>
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center">
+                                    <label for="insumoId" class="block text-gray-454545 font-medium mr-7 mb-2 text-sm">Insumo <span class="text-red-500">*</span></label>
+                                    <select id="insumoId" name="insumoId" asp-items="@(new SelectList(Model.Insumos, "InsumoId", "Nombre"))" class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-48 ml-10 p-2.5">
+                                        <option value="">Seleccionar insumo</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center mt-4">
+                                    <label for="cantidad" class="block text-gray-454545 font-medium mr-7 mb-2 text-sm">Cantidad <span class="text-red-500">*</span></label>
+                                    <input type="number" id="cantidad" name="cantidad" class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-48 ml-10 p-2.5" placeholder="Ingrese la cantidad" required="">
+                                    <button type="button" id="agregarDetalle" class="ml-4 px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                        +
+                                    </button>
+                                </div>
+                                <div class="mt-6">
+                                    <table id="detalleTable" class="w-full border-collapse border border-gray-300 mt-4">
+                                        <thead>
+                                            <tr class="bg-gray-100">
+                                                <th class="p-3 border-b border-gray-300">Insumo</th>
+                                                <th class="p-3 border-b border-gray-300">Cantidad</th>
+                                                <th class="p-3 border-b border-gray-300">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Aquí se agregarán dinámicamente los detalles de insumos -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-8">
+                                <button type="button" data-modal-toggle="crud-modal" class="text-white inline-flex items-center bg-red-700 hover:bg-red-800 focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+                                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                                    Cancelar
+                                </button>
+                                <button type="submit" id="submitForm" class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center">
+                                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                                    Guardar
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Productos != null && Model.Productos.Any())
+            {
+                <div class="p-10 flex justify-center items-center">
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                        <table class="w-full text-sm text-left text-gray-500 text-center">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-12 py-3">
+                                        Nombre
+                                    </th>
+                                    <th scope="col" class="px-12 py-3">
+                                        Precio
+                                    </th>
+                                    <th scope="col" class="px-16 py-3">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var producto in Model.Productos)
+                                {
+                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-12 py-4 font-medium text-gray-454545 whitespace-nowrap">
+                                            @producto.Nombre
+                                        </td>
+                                        <td class="px-12 py-4">
+                                            @producto.Precio
+                                        </td>
+                                        <td class="px-12 py-4">
+                                            <button type="button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-green-500 hover:text-green-700 focus:outline-none agregar-insumo" data-producto-id="@producto.ProductoId">
+                                                Agregar Insumo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="flex flex-col justify-center items-center h-full">
+                    <p class="text-center mb-4 text-gray-700">No hay ningún producto para mostrar.</p>
+                    <img src="~/iconos/paquete.svg" alt="Icono de producto" class="w-60 h-60">
+                </div>
+            }
+        </main>
+
+    
+</div>
+
+
+    @section Scripts {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var detalleTable = document.getElementById("detalleTable");
+                var registroForm = document.getElementById("registroForm");
+                var productoIdInput = document.getElementById("productoId");
+                var insumoIdInput = document.getElementById("insumoId");
+                var cantidadInput = document.getElementById("cantidad");
+                var submitFormButton = document.getElementById("submitForm");
+                var agregarDetalleButton = document.getElementById("agregarDetalle");
+
+                // Evento para abrir el modal y configurar el productoId
+                document.querySelectorAll(".agregar-insumo").forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        var productoId = this.getAttribute("data-producto-id");
+                        productoIdInput.value = productoId;
+                    });
+                });
+
+                agregarDetalleButton.addEventListener("click", function () {
+                    var insumoId = insumoIdInput.value;
+                    var insumoText = insumoIdInput.options[insumoIdInput.selectedIndex].text;
+                    var cantidad = cantidadInput.value;
+
+                    if (insumoId && cantidad) {
+                        // Crear nueva fila para el detalle de insumo
+                        var newRow = document.createElement("tr");
+                        newRow.innerHTML = `
+                            <td class="p-3 border-b border-gray-300" data-insumo-id="${insumoId}">${insumoText}</td>
+                            <td class="p-3 border-b border-gray-300">${cantidad}</td>
+                            <td class="p-3 border-b border-gray-300">
+                                <button type="button" class="text-red-500 hover:text-red-700 focus:outline-none quitar-detalle">
+                                    Eliminar
+                                </button>
+                            </td>
+                        `;
+                        detalleTable.querySelector("tbody").appendChild(newRow);
+
+                        // Limpiar los campos de insumo y cantidad
+                        insumoIdInput.value = "";
+                        cantidadInput.value = "";
+                    }
+                });
+
+                detalleTable.addEventListener("click", function (event) {
+                    if (event.target.classList.contains("quitar-detalle")) {
+                        event.target.closest("tr").remove();
+                    }
+                });
+
+                submitFormButton.addEventListener("click", function (event) {
+                    // Prevenir el comportamiento por defecto del botón de enviar
+                    event.preventDefault();
+
+                    var detalleRows = detalleTable.querySelectorAll("tbody tr");
+                    var detalleInsumosContainer = document.getElementById("detalleInsumosContainer");
+                    detalleInsumosContainer.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevos inputs ocultos
+
+                    detalleRows.forEach(function (row, index) {
+                        var insumoId = row.querySelector("[data-insumo-id]").dataset.insumoId;
+                        var cantidad = parseInt(row.cells[1].innerText);
+
+                        console.log("InsumoId: ", insumoId);
+                        console.log("Cantidad: ", cantidad);
+
+                        var hiddenInputInsumoId = document.createElement("input");
+                        hiddenInputInsumoId.type = "hidden";
+                        hiddenInputInsumoId.name = "detalleInsumos[" + index + "].InsumoId";
+                        hiddenInputInsumoId.value = insumoId;
+                        detalleInsumosContainer.appendChild(hiddenInputInsumoId);
+
+                        var hiddenInputCantidad = document.createElement("input");
+                        hiddenInputCantidad.type = "hidden";
+                        hiddenInputCantidad.name = "detalleInsumos[" + index + "].Cantidad";
+                        hiddenInputCantidad.value = cantidad;
+                        detalleInsumosContainer.appendChild(hiddenInputCantidad);
+                    });
+
+                    // Asegurar que el productoId está presente
+                    if (!productoIdInput.value) {
+                        alert("Por favor selecciona un producto.");
+                        return;
+                    }
+
+                    console.log("ProductoId: ", productoIdInput.value);
+
+                    // Enviar el formulario
+                    console.log("Formulario a enviar:", new FormData(registroForm));
+                    registroForm.submit();
+                });
+            });
+        </script>
+    }
