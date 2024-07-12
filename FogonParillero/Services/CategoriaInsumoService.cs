@@ -8,24 +8,48 @@ namespace FogonParillero.Services
     public class CategoriaInsumoService : ICategoriaInsumoInterface
     {
         private readonly ApplicationContext _contexto;
+        private readonly IAuditoriaInterface _auditoriaInterface;
 
 
-        public CategoriaInsumoService(ApplicationContext contexto)
+        public CategoriaInsumoService(ApplicationContext contexto, IAuditoriaInterface auditoriaInterface)
         {
             _contexto = contexto;
-
+            _auditoriaInterface = auditoriaInterface;
         }
 
         public async Task<CategoriaInsumo> Actualizar(CategoriaInsumo categoriaInsumo)
         {
             _contexto.CategoriasInsumo.Update(categoriaInsumo);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Actualizar",
+                NombreTablaAfectada = "CategoriaInsumo",
+                IdRegistroAfectado = categoriaInsumo.CategoriaId,
+                DetallesCambio = "Actualización de categoría de insumo",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
             return categoriaInsumo;
         }
 
         public async Task<CategoriaInsumo> Eliminar(CategoriaInsumo categoriaInsumo)
         {
             _contexto.CategoriasInsumo.Remove(categoriaInsumo);
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Eliminar",
+                NombreTablaAfectada = "CategoriaInsumo",
+                IdRegistroAfectado = categoriaInsumo.CategoriaId,
+                DetallesCambio = "Eliminación de categoría de insumo",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
+
             await _contexto.SaveChangesAsync();
             return categoriaInsumo;
         }
@@ -49,6 +73,17 @@ namespace FogonParillero.Services
 
             await _contexto.CategoriasInsumo.AddAsync(nuevoCategoriaInsumo);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Registrar",
+                NombreTablaAfectada = "CategoriaInsumo",
+                IdRegistroAfectado = nuevoCategoriaInsumo.CategoriaId,
+                DetallesCambio = "Registro de nueva categoría de insumo",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
 
 
             return nuevoCategoriaInsumo;

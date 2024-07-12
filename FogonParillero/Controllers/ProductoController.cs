@@ -21,6 +21,10 @@ namespace FogonParillero.Controllers
 
         public async Task<IActionResult> Index(int? id)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Login");
+            }
             var productoViewModel = new ProductoViewModel
             {
                 Productos = await _producto.ObtenerTodosAsync(),

@@ -15,6 +15,10 @@ namespace FogonParillero.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Login");
+            }
             var categorias = await _categoria.ObtenerTodosAsync();
             ViewData["ModalAbierto"] = false;
             return View(categorias);

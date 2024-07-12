@@ -9,11 +9,13 @@ namespace FogonParillero.Services
     {
         private readonly ApplicationContext _contexto;
         private readonly IImagenService _imagenService;
+        private readonly IAuditoriaInterface _auditoriaInterface;
 
-        public ProductoService(ApplicationContext contexto, IImagenService imagenService)
+        public ProductoService(ApplicationContext contexto, IImagenService imagenService, IAuditoriaInterface auditoriaInterface)
         {
             _contexto = contexto;
             _imagenService = imagenService;
+            _auditoriaInterface = auditoriaInterface;
         }
 
         public async Task<Producto> Actualizar(Producto producto)
@@ -23,6 +25,17 @@ namespace FogonParillero.Services
 
             _contexto.Productos.Update(producto);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Actualizar",
+                NombreTablaAfectada = "Producto",
+                IdRegistroAfectado = producto.ProductoId,
+                DetallesCambio = "Actualización de producto",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
 
             if (base64 != null)
             {
@@ -39,6 +52,18 @@ namespace FogonParillero.Services
         {
             _contexto.Productos.Remove(producto);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Eliminar",
+                NombreTablaAfectada = "Producto",
+                IdRegistroAfectado = producto.CategoriaId,
+                DetallesCambio = "Eliminación de producto",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
+
             return producto;
         }
 
@@ -65,6 +90,17 @@ namespace FogonParillero.Services
             };
             await _contexto.Productos.AddAsync(nuevoProducto);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Registrar",
+                NombreTablaAfectada = "Producto",
+                IdRegistroAfectado = producto.ProductoId,
+                DetallesCambio = "Registro de nuevo producto",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
 
             if (producto.ImagenUrl != null)
             {

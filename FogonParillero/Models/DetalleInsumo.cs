@@ -17,6 +17,7 @@ namespace FogonParillero.Models
         [Required]
         [Column("insumo_id")]
         public int InsumoId { get; set; }
+        public Insumo Insumo { get; set; }
 
         [Required]
         [Column("cantidad", TypeName = "decimal(15, 2)")]

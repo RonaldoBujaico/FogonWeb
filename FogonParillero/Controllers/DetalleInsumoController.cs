@@ -20,31 +20,29 @@ namespace FogonParillero.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Login");
+            }
             var model = new DetalleInsumoViewModel
             {
                 Productos = await _producto.ObtenerTodosAsync(),
-                Insumos = await _insumo.ObtenerTodosAsync()
+                Insumos = await _insumo.ObtenerTodosAsync(),
+                DetallesInsumosPorProducto = new Dictionary<int, IEnumerable<DetalleInsumo>>()
             };
+
+            foreach (var producto in model.Productos)
+            {
+                var detallesInsumos = await _detalleInsumo.ObtenerDetalleInsumo(producto.ProductoId);
+                model.DetallesInsumosPorProducto.Add(producto.ProductoId, detallesInsumos);
+            }
+
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Registrar(string productoId, List<DetalleInsumo> detalleInsumos)
         {
-            // Debugging logs
-            Console.WriteLine("ProductoId: " + productoId);
-            if (detalleInsumos != null)
-            {
-                foreach (var detalle in detalleInsumos)
-                {
-                    Console.WriteLine("InsumoId: " + detalle.InsumoId + ", Cantidad: " + detalle.Cantidad);
-                }
-            }
-            else
-            {
-                Console.WriteLine("No se recibieron detalles de insumo");
-            }
-
             if (!string.IsNullOrEmpty(productoId) && detalleInsumos != null && detalleInsumos.Any())
             {
                 foreach (var detalle in detalleInsumos)
@@ -53,9 +51,7 @@ namespace FogonParillero.Controllers
                     await _detalleInsumo.AddDetalleInsumo(detalle);
                 }
             }
-
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
