@@ -9,11 +9,13 @@ namespace FogonParillero.Services
     {
         private readonly ApplicationContext _contexto;
         private readonly IImagenService _imagenService;
+        private readonly IAuditoriaInterface _auditoriaInterface;
 
-        public InsumoService(ApplicationContext contexto, IImagenService imagenService)
+        public InsumoService(ApplicationContext contexto, IImagenService imagenService, IAuditoriaInterface auditoriaInterface)
         {
             _contexto = contexto;
             _imagenService = imagenService;
+            _auditoriaInterface = auditoriaInterface;
         }
 
         public async Task<Insumo> Actualizar(Insumo Insumo)
@@ -31,6 +33,17 @@ namespace FogonParillero.Services
                 Insumo.Imagen = imagenUrl;
                 _contexto.Update(Insumo);
                 await _contexto.SaveChangesAsync();
+
+                var auditoria = new Auditoria
+                {
+                    TipoOperacion = "Actualizar",
+                    NombreTablaAfectada = "Insumo",
+                    IdRegistroAfectado = Insumo.CategoriaInsumoId,
+                    DetallesCambio = "Actualización de insumo",
+                    FechaHoraOperacion = DateTime.UtcNow,
+                };
+
+                await _auditoriaInterface.Registrar(auditoria);
             }
             return Insumo;
         }
@@ -39,6 +52,18 @@ namespace FogonParillero.Services
         {
             _contexto.Insumos.Remove(Insumo);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Eliminar",
+                NombreTablaAfectada = "Insumo",
+                IdRegistroAfectado = Insumo.CategoriaInsumoId,
+                DetallesCambio = "Eliminación de insumo",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
+
             return Insumo;
         }
 
@@ -66,6 +91,17 @@ namespace FogonParillero.Services
             };
             await _contexto.Insumos.AddAsync(nuevoInsumo);
             await _contexto.SaveChangesAsync();
+
+            var auditoria = new Auditoria
+            {
+                TipoOperacion = "Registrar",
+                NombreTablaAfectada = "Insumo",
+                IdRegistroAfectado = nuevoInsumo.InsumoId,
+                DetallesCambio = "Registro de nuevo insumo",
+                FechaHoraOperacion = DateTime.UtcNow,
+            };
+
+            await _auditoriaInterface.Registrar(auditoria);
 
             if (img != null)
             {

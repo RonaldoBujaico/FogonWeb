@@ -1,0 +1,68 @@
+﻿@model IEnumerable<FogonParillero.Models.Auditoria>
+@{
+    ViewData["Title"] = "Auditoría";
+}
+
+<div class="flex">
+    @Html.Partial("_MenuLateral")
+    <div class="flex-1">
+        <main class="p-10">
+            <h1 class="text-3xl font-bold mb-6">Registros de Auditoría</h1>
+
+            <div class="mb-4">
+                <input type="text" id="searchInput" placeholder="Buscar..." class="w-full p-2 border rounded">
+            </div>
+
+            <div class="overflow-x-auto">
+                <table id="auditoriaTable" class="min-w-full bg-white">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Operación</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tabla Afectada</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Registro</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalles</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha y Hora</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.Id</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.TipoOperacion</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.NombreTablaAfectada</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.IdRegistroAfectado</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.DetallesCambio</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.FechaHoraOperacion.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@item.UsuarioId</td>
+                                <td class="px-6 py-4 whitespace-nowrap">@(item.Usuario?.Nombres ?? "N/A")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const table = document.getElementById('auditoriaTable');
+            const rows = table.getElementsByTagName('tr');
+
+            searchInput.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase();
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.indexOf(query) > -1 ? '' : 'none';
+                }
+            });
+        });
+    </script>
+}

@@ -1,26 +1,23 @@
 ﻿@model FogonParillero.ViewModel.DetalleInsumoViewModel
 
 <div class="flex h-screen">
-   @Html.Partial("_MenuLateral")
+    @Html.Partial("_MenuLateral")
 
-   <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col">
         <div class="bg-transparent-800 text-black p-4 flex justify-between items-center">
             <div class="flex">
                 <a href="/producto" class="text-xl mr-12 ml-6 font-bold text-gray-700 opacity-60">Productos</a>
                 <a href="/categoriaproducto" class="text-xl mr-12 font-bold text-gray-700 opacity-60">Categorías</a>
                 <a href="/detalleinsumo" class="text-xl mr-12 font-bold textgray-700">Detalle Insumos</a>
             </div>
-    </div>
+        </div>
 
-    <div class="bg-gray-300 h-px w-full"></div>
+        <div class="bg-gray-300 h-px w-full"></div>
 
         <main class="flex-1">
-            <!-- Main modal -->
             <div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div class="relative p-4 w-full max-w-md max-h-full">
-                    <!-- Modal content -->
                     <div class="relative bg-white rounded-lg shadow">
-                        <!-- Modal header -->
                         <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t-lg">
                             <h3 class="text-2xl font-bold text-gray-454545">
                                 Detalle de Insumos
@@ -32,7 +29,6 @@
                                 <span class="sr-only">Cerrar modal</span>
                             </button>
                         </div>
-                        <!-- Modal body -->
                         <form id="registroForm" asp-action="Registrar" method="post" novalidate>
                             <input type="hidden" id="productoId" name="productoId" />
                             <div id="detalleInsumosContainer"></div>
@@ -95,6 +91,9 @@
                                         Precio
                                     </th>
                                     <th scope="col" class="px-16 py-3">
+                                        Detalle de Insumos
+                                    </th>
+                                    <th scope="col" class="px-16 py-3">
                                         Acciones
                                     </th>
                                 </tr>
@@ -108,6 +107,21 @@
                                         </td>
                                         <td class="px-12 py-4">
                                             @producto.Precio
+                                        </td>
+                                        <td class="px-16 py-4">
+                                            @if (Model.DetallesInsumosPorProducto.ContainsKey(producto.ProductoId))
+                                            {
+                                                <ul>
+                                                    @foreach (var detalle in Model.DetallesInsumosPorProducto[producto.ProductoId])
+                                                    {
+                                                        <li>@detalle.Insumo.Nombre - Cantidad: @detalle.Cantidad</li>
+                                                    }
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <p>No hay detalles de insumos para este producto.</p>
+                                            }
                                         </td>
                                         <td class="px-12 py-4">
                                             <button type="button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-green-500 hover:text-green-700 focus:outline-none agregar-insumo" data-producto-id="@producto.ProductoId">
@@ -129,11 +143,7 @@
                 </div>
             }
         </main>
-
-    
-</div>
-
-
+    </div>
     @section Scripts {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -162,14 +172,14 @@
                         // Crear nueva fila para el detalle de insumo
                         var newRow = document.createElement("tr");
                         newRow.innerHTML = `
-                            <td class="p-3 border-b border-gray-300" data-insumo-id="${insumoId}">${insumoText}</td>
-                            <td class="p-3 border-b border-gray-300">${cantidad}</td>
-                            <td class="p-3 border-b border-gray-300">
-                                <button type="button" class="text-red-500 hover:text-red-700 focus:outline-none quitar-detalle">
-                                    Eliminar
-                                </button>
-                            </td>
-                        `;
+                                        <td class="p-3 border-b border-gray-300" data-insumo-id="${insumoId}">${insumoText}</td>
+                                        <td class="p-3 border-b border-gray-300">${cantidad}</td>
+                                        <td class="p-3 border-b border-gray-300">
+                                            <button type="button" class="text-red-500 hover:text-red-700 focus:outline-none quitar-detalle">
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    `;
                         detalleTable.querySelector("tbody").appendChild(newRow);
 
                         // Limpiar los campos de insumo y cantidad

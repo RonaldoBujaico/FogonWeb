@@ -1,7 +1,9 @@
-﻿namespace FogonParillero.Interfaces
+﻿using FogonParillero.Models;
+
+namespace FogonParillero.Interfaces
 {
     public interface IUsuarioInterface
     {
-        Task<bool> AutenticarUsuarioAsync(string dni, string contraseña);
+        Task<Usuario> AutenticarUsuarioAsync(string dni, string contraseña);
     }
 }

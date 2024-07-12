@@ -1,5 +1,6 @@
 ﻿using FogonParillero.Data;
 using FogonParillero.Interfaces;
+using FogonParillero.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,11 +16,10 @@ namespace FogonParillero.Services
             _contexto = contexto;
         }
 
-        public async Task<bool> AutenticarUsuarioAsync(string dni, string contraseña)
+        public async Task<Usuario> AutenticarUsuarioAsync(string dni, string contraseña)
         {
             string hashedContraseña = GenerarHashSHA512(contraseña);
-            var usuario = await _contexto.Usuarios.FirstOrDefaultAsync(u => u.Dni == dni && u.Contraseña == hashedContraseña);
-            return usuario != null;
+            return await _contexto.Usuarios.FirstOrDefaultAsync(u => u.Dni == dni && u.Contraseña == hashedContraseña);
         }
 
         private string GenerarHashSHA512(string input)
